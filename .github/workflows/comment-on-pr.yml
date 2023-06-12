@@ -30,13 +30,11 @@ jobs:
       run: echo "PR_NUMBER=$(cat pr-number)" >> $GITHUB_ENV
     - name: Confirm the PR Number (Debugging)
       run: echo ${{ env.PR_NUMBER }}
-    - name: Confirm again the PR Number (Debugging)
-      run: echo ${{ github.event.workflow_run.event.pull_request.number }}
 
     - name: Add Test Result Comment
       uses: marocchino/sticky-pull-request-comment@v2
       with:
-        number: ${{ github.event.workflow_run.event.pull_request.number }}
+        number: ${{ env.PR_NUMBER }}
         hide_and_recreate: true
         hide_classify: "OUTDATED"
         header: Test Result

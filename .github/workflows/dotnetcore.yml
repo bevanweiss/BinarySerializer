@@ -33,7 +33,9 @@ jobs:
     - name: Prettify Test results
       id: pretty_test
       run: |
-        cat ./test-results.txt > ./test-results.md
+        echo "<details><summary>Test Results</summary>" > ./test-results.md
+        cat ./test-results.txt >> ./test-results.md
+        echo "</details>" >> ./test
         cat ./test-results.md >> $GITHUB_STEP_SUMMARY
 
     - name: Code Coverage Report
