@@ -9,14 +9,18 @@ namespace BinarySerialization.Test.Value
         [TestMethod]
         public void DeserializePng()
         {
-            string path = Path.Combine("Value", "image.png");
+            byte[] data;
+
+            var path = Path.Combine("Value", "image.png");
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                var data = new byte[stream.Length];
-                stream.Read(data, 0, data.Length);
-                
-                RoundtripReverse<Png>(data);
+                data = new byte[stream.Length];
+                var read = stream.Read(data, 0, data.Length);
+
+                Assert.AreEqual(read, stream.Length);
             }
+
+            RoundtripReverse<Png>(data);
         }
     }
 }

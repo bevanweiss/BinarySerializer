@@ -55,21 +55,15 @@ namespace BinarySerialization.Graph.ValueGraph
         private readonly Dictionary<FieldValueAttributeBase, FieldValueAdapterStream> _fieldValueAttributeTaps;
         private readonly Dictionary<FieldValueAttributeBase, object> _fieldValueAttributeFinalValue;
 
-        private bool ShouldSerialize(Func<Binding, object> bindingValueSelector)
+        private bool ShouldSerializeImpl(Func<Binding, object> bindingValueSelector)
         {
             return TypeNode.SerializeWhenBindings == null || 
                    TypeNode.SerializeWhenBindings.Any(binding => binding.IsSatisfiedBy(bindingValueSelector(binding)));
         }
 
-        public bool ShouldSerialize()
-        {
-            return ShouldSerialize(binding => binding.GetBoundValue(this));
-        }
+        internal bool ShouldSerialize => ShouldSerializeImpl(binding => binding.GetBoundValue(this));
 
-        public bool ShouldDeserialize()
-        {
-            return ShouldSerialize(binding => binding.GetValue(this));
-        }
+        internal bool ShouldDeserialize => ShouldSerializeImpl(binding => binding.GetValue(this));
 
         public virtual void Bind()
         {
@@ -197,6 +191,11 @@ namespace BinarySerialization.Graph.ValueGraph
         {
             try
             {
+                if (!ShouldSerialize)
+                {
+                    return;
+                }
+
                 if (align)
                 {
                     AlignLeft(stream, true);
@@ -246,6 +245,11 @@ namespace BinarySerialization.Graph.ValueGraph
         {
             try
             {
+                if (!ShouldSerialize)
+                {
+                    return;
+                }
+
                 if (align)
                 {
                     AlignLeft(stream, true);
@@ -306,6 +310,11 @@ namespace BinarySerialization.Graph.ValueGraph
         {
             try
             {
+                if (!ShouldDeserialize)
+                {
+                    return;
+                }
+
                 AlignLeft(stream);
 
                 var offset = GetFieldOffset();
@@ -352,6 +361,11 @@ namespace BinarySerialization.Graph.ValueGraph
         {
             try
             {
+                if (!ShouldDeserialize)
+                {
+                    return;
+                }
+
                 AlignLeft(stream);
 
                 var offset = GetFieldOffset();
@@ -627,6 +641,11 @@ namespace BinarySerialization.Graph.ValueGraph
 
         private object SubtypeBindingCallback(TypeNode typeNode)
         {
+            if (!ShouldSerialize)
+            {
+                return UnsetValue;
+            }
+
             var valueType = GetValueTypeOverride();
             if (valueType == null)
             {
